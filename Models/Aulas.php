@@ -47,15 +47,22 @@ class Aulas extends Model {
     public function getAula($id_aula){
         $array = array();
 
-        $sql = $this->pdo->prepare("SELECT tipo, id as id_aula FROM aulas WHERE id = :id_aula");
+        $id_aluno = $_SESSION['lgaluno'];
+
+        $sql = $this->pdo->prepare("SELECT tipo, id as id_aula, 
+                                    (select count(*) from historico where historico.id_aula = aulas.id and historico.id_aluno = :id_aluno) as assistido 
+                                    FROM aulas WHERE id = :id_aula");
         $sql->bindValue(":id_aula", $id_aula);
+        $sql->bindValue(":id_aluno", $id_aluno);
         $sql->execute();
 
         if($sql->rowCount() > 0)
         {
-            $sql = $sql->fetch();
+            
+            $row = $sql->fetch();
+            
 
-            if($sql['tipo'] == 1) {
+            if($row['tipo'] == 1) {
                 $sql = $this->pdo->prepare("SELECT * FROM videos WHERE id_aula = :id_aula");
                 $sql->bindValue(":id_aula", $id_aula);
                 $sql->execute();
@@ -63,9 +70,9 @@ class Aulas extends Model {
                 if($sql->rowCount() > 0) {
                     $array = $sql->fetch();
                     $array['tipo'] = 'video';
-                    return $array;
+                    
                 }
-            }else {
+            }else if($row['tipo'] == 2){
                 $sql = $this->pdo->prepare("SELECT * FROM questionarios WHERE id_aula = :id_aula");
                 $sql->bindValue(":id_aula", $id_aula);
                 $sql->execute();
@@ -73,11 +80,14 @@ class Aulas extends Model {
                 if($sql->rowCount() > 0) {
                     $array = $sql->fetch();
                     $array['tipo'] = 'questionario';
-                    return $array;
+                   
                 }
             }
+            
+            $array['assistido'] = $row['assistido'];
+            
         }
-
+        
         return $array;
     }
 
@@ -85,6 +95,13 @@ class Aulas extends Model {
         $sql = $this->pdo->prepare("INSERT INTO duvidas(data_duvida, duvida, id_aluno) VALUES (NOW(), :duvida, :id_aluno)");
         $sql->bindValue(":id_aluno", $id_aluno);
         $sql->bindValue(":duvida", $duvida);
+        $sql->execute();
+    }
+
+    public function marcarAssistido($id_aula){
+        $sql = $this->pdo->prepare("INSERT INTO historico SET data_viewed = NOW(), id_aluno = :aluno, id_aula =:id");
+        $sql->bindValue(":aluno", $_SESSION['lgaluno']);
+        $sql->bindValue(":id", $id_aula);
         $sql->execute();
     }
 }
