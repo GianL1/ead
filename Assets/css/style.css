@@ -10,9 +10,9 @@ body{
     color: #FFF;
 }
 a{
-    color: #FFF;
+    
     text-decoration: none;
-    float: right;
+    float: left
 }
 .topo a div {
     height: 40px;
