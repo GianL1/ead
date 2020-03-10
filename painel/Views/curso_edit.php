@@ -67,7 +67,7 @@
 
     <?php foreach($modulo['aulas'] as $aula): ?>
         
-        <h5><?php echo $aula['nome']; ?> - <a href="">[editar]</a> - 
+        <h5><?php echo $aula['nome']; ?> - <a href="<?php echo BASE_URL;?>home/edit_aula/<?php echo $aula['id'];?>">[editar]</a> -
             <a href="<?php echo BASE_URL;?>home/del_aula/<?php echo $aula['id'];?>">[ Excluir ]</a>
         </h5>
     <?php endforeach; ?>

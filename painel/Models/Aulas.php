@@ -47,13 +47,10 @@ class Aulas extends Model {
     public function getAula($id_aula){
         $array = array();
 
-        $id_aluno = $_SESSION['lgaluno'];
 
-        $sql = $this->pdo->prepare("SELECT tipo, id as id_aula, 
-                                    (select count(*) from historico where historico.id_aula = aulas.id and historico.id_aluno = :id_aluno) as assistido 
+        $sql = $this->pdo->prepare("SELECT tipo 
                                     FROM aulas WHERE id = :id_aula");
         $sql->bindValue(":id_aula", $id_aula);
-        $sql->bindValue(":id_aluno", $id_aluno);
         $sql->execute();
 
         if($sql->rowCount() > 0)
@@ -83,8 +80,6 @@ class Aulas extends Model {
                    
                 }
             }
-            
-            $array['assistido'] = $row['assistido'];
             
         }
         
@@ -159,5 +154,28 @@ class Aulas extends Model {
                 $sql->bindValue(":id_aula", $id_aula);
                 $sql->execute();
             }
+    }
+
+    public function updateVideoAula($id_aula, $nome, $descricao, $url) {
+        $sql = $this->pdo->prepare("UPDATE videos SET nome = :nome, descricao = :descricao, url =:url WHERE id_aula = :id_aula");
+        $sql->bindValue(":nome",$nome);
+        $sql->bindValue(":descricao", $descricao);
+        $sql->bindValue(":url", $url);
+        $sql->bindValue(":id_aula", $id_aula);
+        $sql->execute();
+    }
+
+    public function updateQuestionarioAula($id_aula, $pergunta, $opcao1, $opcao2, $opcao3, $opcao4, $resposta)
+    {
+        $sql = $this->pdo->prepare("UPDATE questionarios SET pergunta = :pergunta, opcao1 = :op1, opcao2 = :op2, opcao3 = :op3, opcao4 = :op4, resposta = :resposta 
+                                                WHERE id_aula = :id_aula");
+        $sql->bindValue(":pergunta", $pergunta);
+        $sql->bindValue(":op1", $opcao1);
+        $sql->bindValue(":op2", $opcao2);
+        $sql->bindValue(":op3", $opcao3);
+        $sql->bindValue(":op4", $opcao4);
+        $sql->bindValue(":resposta", $resposta);
+        $sql->bindValue(":id_aula", $id_aula);
+        $sql->execute();
     }
 }

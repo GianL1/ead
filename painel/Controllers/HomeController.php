@@ -137,4 +137,46 @@ class HomeController extends Controller {
         header("Location:".BASE_URL);
         exit;
     }
+
+    public function edit_aula($id_aula){
+        $dados = array();
+        $view = 'curso_edit_aula_video';
+        $aulas = new Aulas();
+
+        if(isset($_POST['nome']) && !empty($_POST['nome'])) {
+            $nome = addslashes($_POST['nome']);
+            $descricao = addslashes($_POST['descricao']);
+            $url = addslashes($_POST['url']);
+
+            $aulas->updateVideoAula($id_aula, $nome, $descricao, $url);
+
+            header("Location:".BASE_URL);
+        }
+
+        if(isset($_POST['pergunta']) && !empty($_POST['pergunta'])) {
+            $pergunta = addslashes($_POST['pergunta']);
+            $opcao1 = addslashes($_POST['opcao1']);
+            $opcao2 = addslashes($_POST['opcao2']);
+            $opcao3 = addslashes($_POST['opcao3']);
+            $opcao4 = addslashes($_POST['opcao4']);
+            $resposta = addslashes($_POST['resposta']);
+
+
+            $aulas->updateQuestionarioAula($id_aula, $pergunta, $opcao1, $opcao2, $opcao3, $opcao4, $resposta);
+
+            header("Location:".BASE_URL);
+        }
+
+        
+
+        $dados['aula'] = $aulas->getAula($id_aula);
+
+        if($dados['aula']['tipo'] == 'video') {
+            $view = 'curso_edit_aula_video';
+        }else {
+            $view = 'curso_edit_aula_poll';
+        }
+
+        $this->loadTemplate($view, $dados);
+    }
 }
