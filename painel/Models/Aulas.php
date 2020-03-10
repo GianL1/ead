@@ -104,4 +104,60 @@ class Aulas extends Model {
         $sql->bindValue(":id", $id_aula);
         $sql->execute();
     }
+
+    public function deleteAula($id_aula) {
+        $sql = $this->pdo->prepare("DELETE FROM aulas WHERE id = :id_aula");
+        $sql->bindValue(":id_aula", $id_aula);
+        $sql->execute();
+
+        $sql = $this->pdo->prepare("DELETE FROM questionarios WHERE id_aula = :id_aula");
+        $sql->bindValue(":id_aula", $id_aula);
+        $sql->execute();
+
+        $sql = $this->pdo->prepare("DELETE FROM videos WHERE id = :id_aula");
+        $sql->bindValue(":id_aula", $id_aula);
+        $sql->execute();
+
+        $sql = $this->pdo->prepare("DELETE FROM historico WHERE id = :id_aula");
+        $sql->bindValue(":id_aula", $id_aula);
+        $sql->execute();
+    }
+
+    public function addAula($id_curso, $id_modulo, $aula, $tipo){
+        $sql = $this->pdo->prepare("SELECT ordem FROM aulas WHERE id_modulo = :id_modulo ORDER BY ordem DESC LIMIT 1");
+        $sql->bindValue(":id_modulo", $id_modulo);
+        $sql->execute();
+
+
+        $ordem = 1;
+
+        if($sql->rowCount() > 0) {
+            $sql = $sql->fetch();
+            $ordem = intval($sql['ordem']);
+            $ordem++;  
+        }
+
+        $sql = $this->pdo->prepare("INSERT INTO aulas SET id_modulo = :id_modulo, 
+        id_curso = :id_curso, 
+        ordem = :ordem, tipo = :tipo");
+        
+        $sql->bindValue(":id_modulo", $id_modulo);
+        $sql->bindValue(":id_curso", $id_curso);
+        $sql->bindValue(":ordem", $ordem);
+        $sql->bindValue(":tipo", $tipo);
+        $sql->execute();
+
+        $id_aula = $this->pdo->lastInsertId();
+
+            if($tipo == 'video') {
+                $sql = $this->pdo->prepare("INSERT INTO videos SET id_aula = :id_aula, nome = :nome");
+                $sql->bindValue(":id_aula", $id_aula);
+                $sql->bindValue(":nome", $aula);
+                $sql->execute();
+            } else {
+                $sql = $this->pdo->prepare("INSERT INTO questionarios SET id_aula = :id_aula");
+                $sql->bindValue(":id_aula", $id_aula);
+                $sql->execute();
+            }
+    }
 }

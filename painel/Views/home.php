@@ -9,7 +9,7 @@
     </tr>
     <?php foreach($cursos as $curso): ?>
     <tr>
-        <td width="120"><img src="<?php echo BASE_URL; ?>../Assets/Images/curso/<?php echo $curso['imagem'];?>" border="0" height="70"  ></td>
+        <td width="120"><img src="<?php echo BASE_URL; ?>../Assets/Images/cursos/<?php echo $curso['imagem'];?>" border="0" height="70"  ></td>
         <td><?php echo $curso['nome']; ?></td>
         <td align="center"><?php echo $curso['qt_alunos']; ?></td>
         <td>

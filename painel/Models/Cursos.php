@@ -84,4 +84,27 @@ class Cursos extends Model {
 
         return $array;
     }
+
+    public function editarCurso($nome, $descricao, $imagem, $id_curso) {
+        $sql = $this->pdo->prepare("UPDATE cursos SET nome = :nome, descricao = :descricao WHERE id = :id_curso");
+        $sql->bindValue(":nome", $nome);
+        $sql->bindValue(":descricao", $descricao);
+        $sql->bindValue(":id_curso", $id_curso);
+        $sql->execute();
+
+        if(!empty($imagem['tmp_name'])) {
+            $md5name = md5(time()).'.jpg';
+            $types = array('image/jpeg', 'image/jpg', 'image/png');
+
+            if(in_array($imagem['type'],  $types)) {
+                move_uploaded_file($imagem['tmp_name'], "../Assets/Images/cursos/".$md5name);
+
+                    $sql = $this->pdo->prepare("UPDATE cursos SET imagem = :imagem WHERE id =:id_curso");
+                    $sql->bindValue(":imagem", $md5name);
+                    $sql->bindValue(":id", $id_curso);
+                    $sql->execute();
+            }
+        }
+    }
+
 }
