@@ -107,4 +107,21 @@ class Cursos extends Model {
         }
     }
 
+    public function getCursosInscritos($id_aluno) {
+        $array = array();
+        $sql = $this->pdo->prepare("SELECT id_curso FROM aluno_curso WHERE id_aluno = :id_aluno");
+        $sql->bindValue(":id_aluno", $id_aluno);
+        $sql->execute();
+
+        if($sql->rowCount() > 0) {
+            $rows = $sql->fetchAll();
+
+            foreach ($rows as $row) {
+                $array[] = $row['id_curso'];
+            }
+        }
+
+        return $array;
+    }
+
 }

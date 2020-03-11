@@ -6,60 +6,73 @@ use \Core\Model;
 
 class Alunos extends Model {
 
-    private $info;
+    public function getAlunos(){
+        $array = array();
+        $sql = $this->pdo->query("SELECT 
+        *, (select count(*) from aluno_curso where aluno_curso.id_aluno = alunos.id) as qt_cursos 
+        FROM alunos");
 
-    public function isLogged(){
-        if(isset($_SESSION['lgaluno']) && !empty($_SESSION['lgaluno'])) {
-            return true;
-        }else {
-            return false;
+        if($sql->rowCount() > 0) {
+            $array = $sql->fetchAll();
         }
+
+        return $array;
     }
 
-    public function fazerLogin($email, $senha){
-        $sql = $this->pdo->prepare("SELECT * FROM alunos WHERE email = :email AND senha = :senha");
+    public function excluirAluno($id){
+        
+
+        $sql = $this->pdo->prepare("DELETE FROM aluno_curso WHERE id_aluno = :id");
+        $sql->bindValue(":id", $id);
+        $sql->execute();
+
+        $sql = $this->pdo->prepare("DELETE FROM alunos WHERE id = :id");
+        $sql->bindValue(":id", $id);
+        $sql->execute();
+
+        header("Location".BASE_URL."alunos");
+    }
+
+    public function adicionarAluno($nome, $email, $senha){
+        $sql = $this->pdo->prepare("INSERT INTO alunos SET nome = :nome, email = :email, senha = :senha");
+        $sql->bindValue(":nome", $nome);
+        $sql->bindValue(":email", $email);
+        $sql->bindValue(":senha", $senha);
+
+        $sql->execute();
+    }
+
+    public function getAluno($id_aluno) {
+        $array = array();
+
+        $sql = $this->pdo->prepare("SELECT * FROM alunos WHERE id = :id");
+        $sql->bindValue(":id", $id_aluno);
+        $sql->execute();
+
+        if($sql->rowCount() > 0 ) {
+            $array = $sql->fetch();
+        }
+
+        return $array;
+    }
+
+    public function editarAluno($id, $nome, $email, $senha, $cursos){
+        $sql = $this->pdo->prepare("UPDATE FROM alunos SET nome = :nome, email = :email, senha =:senha WHERE id = :id");
+        $sql->bindValue(":nome", $nome);
         $sql->bindValue(":email", $email);
         $sql->bindValue(":senha", $senha);
         $sql->execute();
 
-        if($sql->rowCount() > 0) {
-            $row = $sql->fetch();
-            $_SESSION['lgaluno'] = $row['id'];
-
-            return true;
-        }else {
-            return false;
-        }
-    }
-
-    public function setAluno($id){
-        $sql = $this->pdo->prepare("SELECT * FROM alunos WHERE id = :id");
-        $sql->bindValue(":id", $id);
+        $sql = $this->pdo->prepare("DELETE FROM aluno_curso WHERE id_aluno = :id_aluno");
+        $sql->bindValue(":id_aluno", $id);
         $sql->execute();
 
-        if($sql->rowCount() > 0) {
-            $this->info = $sql->fetch();
+        foreach($cursos as $curso) {
+            $sql = $this->pdo->prepare("INSERT INTO aluno_curso SET id_aluno = :id_aluno, id_curso = :id_curso");
+            $sql->bindValue(":id_aluno", $id);
+            $sql->bindValue(":id_curso", $curso);
+            $sql->execute();
         }
     }
-
-    public function getNome(){
-        return $this->info['nome'];
-    }
-
-    public function getId(){
-        return $this->info['id'];
-    }
-
-    public function isInscrito($id_curso) {
-        $sql = $this->pdo->prepare("SELECT * FROM aluno_curso WHERE id_aluno =:id_aluno AND id_curso = :id_curso");
-        $sql->bindValue(":id_aluno", $this->info['id']);
-        $sql->bindValue(":id_curso", $id_curso);
-        $sql->execute();
-
-        if($sql->rowCount() > 0) {
-            return true;
-        }else {
-            return false;
-        }
-    }
+    
 }

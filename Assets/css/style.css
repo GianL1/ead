@@ -10,13 +10,11 @@ body{
     color: #FFF;
 }
 a{
-    
     text-decoration: none;
-    float: left
 }
 .topo a div {
     height: 40px;
-    float: right;
+    float: left;
     padding-right: 20px;
     padding-left: 20px;
     line-height: 40px;
