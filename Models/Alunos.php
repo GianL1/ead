@@ -62,4 +62,14 @@ class Alunos extends Model {
             return false;
         }
     }
+
+    public function getNumAulasAssistidas($id_curso){
+        //Seleciona todos os ID de históricos onde o id do Aluno foi o setado e o id da aula estiver naquele determinado curso
+        $sql = $this->pdo->prepare("SELECT id FROM historico WHERE id_aluno = :id_aluno AND id_aula IN (select aulas.id from aulas where aulas.id_curso = :id_curso)");
+        $sql->bindValue(":id_aluno", $this->getId());
+        $sql->bindValue(":id_curso",$id_curso);
+        $sql->execute();
+
+        return $sql->rowCount();
+    }
 }

@@ -43,6 +43,8 @@ class CursosController extends Controller {
 
             $modulos = new Modulos();
             $dados['modulos'] = $modulos->getModulos($id_curso);
+            $dados['aulas_assistidas'] = $alunos->getNumAulasAssistidas($id_curso);
+            $dados['total_de_aulas'] = $cursos->getTotalAulas();
             
             
             $this->loadTemplate('curso_entrar', $dados);
@@ -76,6 +78,8 @@ class CursosController extends Controller {
 
             $modulos = new Modulos();
             $dados['modulos'] = $modulos->getModulos($id);
+            $dados['aulas_assistidas'] = $alunos->getNumAulasAssistidas($id);
+            $dados['total_de_aulas'] = $cursos->getTotalAulas();
             $dados['aula_info'] = $aula->getAula($id_aula);
 
             if($dados['aula_info']['tipo'] == 'video') {
@@ -99,6 +103,7 @@ class CursosController extends Controller {
 
                 if($opcao == $dados['aula_info']['resposta']) {
                     $dados['resposta'] = true;
+                    $aula->marcarAssistido($id_aula);
                 }else {
                     $dados['resposta'] = false;
                 }

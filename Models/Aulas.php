@@ -6,6 +6,7 @@ use \Core\Model;
 class Aulas extends Model {
     public function getAulasDoModulo($id_modulo){
         $array = array();
+        $aluno = $_SESSION['lgaluno'];
 
         $sql = $this->pdo->prepare("SELECT *, aulas.id as id_aula FROM aulas WHERE id_modulo = :id_modulo ORDER BY ordem");
         $sql->bindValue(":id_modulo", $id_modulo);
@@ -15,6 +16,8 @@ class Aulas extends Model {
             $array = $sql->fetchAll();
             
             foreach($array as $aulaChave => $aula) {
+                $array[$aulaChave]['assistida'] = $this->isAssistido($aula['id'], $aluno);
+                
                 if($aula['tipo'] == 1) {
                     $id = $aula['id'];
                     $sql = $this->pdo->query("SELECT nome FROM videos WHERE id_aula = $id")->fetch();
@@ -103,5 +106,18 @@ class Aulas extends Model {
         $sql->bindValue(":aluno", $_SESSION['lgaluno']);
         $sql->bindValue(":id", $id_aula);
         $sql->execute();
+    }
+
+    private function isAssistido($id_aula, $id_aluno){
+        $sql = $this->pdo->prepare("SELECT id FROM historico WHERE id_aluno = :id_aluno AND id_aula = :id_aula");
+        $sql->bindValue(":id_aluno", $id_aluno);
+        $sql->bindValue(":id_aula", $id_aula);
+        $sql->execute();
+
+        if($sql->rowCount() > 0) {
+            return true;
+        }else {
+            return false;
+        }
     }
 }
