@@ -99,9 +99,19 @@ class Cursos extends Model {
             if(in_array($imagem['type'],  $types)) {
                 move_uploaded_file($imagem['tmp_name'], "../Assets/Images/cursos/".$md5name);
 
+                    $sql = $this->pdo->prepare("SELECT imagem FROM cursos WHERE id = :id_curso");
+                    $sql->bindValue(":id_curso", $id_curso);
+                    $sql->execute();
+
+                    if($sql->rowCount() > 0) {
+                        $imagem = $sql->fetch();
+                        
+                        unlink("../Assets/Images/cursos/".$imagem['imagem']);
+                    }
+
                     $sql = $this->pdo->prepare("UPDATE cursos SET imagem = :imagem WHERE id =:id_curso");
                     $sql->bindValue(":imagem", $md5name);
-                    $sql->bindValue(":id", $id_curso);
+                    $sql->bindValue(":id_curso", $id_curso);
                     $sql->execute();
             }
         }
